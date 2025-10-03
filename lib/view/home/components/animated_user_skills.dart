@@ -3,9 +3,10 @@ import 'package:flutter/material.dart';
 
 class AnimatedUserSkills extends StatelessWidget {
   final List<String> skills = [
-    'Android Development',
-    'Flutter Development',
-    'Spring Boot',
+    'Mobile Dev',
+    'Android',
+    'Jetpack Compose',
+    'Flutter',
   ];
 
   AnimatedUserSkills({super.key});

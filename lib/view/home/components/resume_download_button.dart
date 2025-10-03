@@ -10,7 +10,7 @@ class ResumeDownloadButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return InkWell(
       onTap: () {
-        launchUrl(Uri.parse('https://drive.google.com/file/d/1Lz6ZNv_FdoLBB2JVj4atAyxyzYAMt7P2/view?usp=drive_link'));
+        launchUrl(Uri.parse('https://github.com/devikiran99/Resume/blob/main/Devikiran_Shetty_PN.pdf'));
       },
       child: Container(
         alignment: Alignment.center,

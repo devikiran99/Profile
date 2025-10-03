@@ -18,7 +18,7 @@ class FooterInfo extends StatelessWidget {
           children: [
             const Text('Designed with ', style: textStyle),
             const Icon(Icons.favorite, color: Colors.red, size: 16),
-            const Text(' by ', style: textStyle),
+            const Text(' by', style: textStyle),
             AppBarTextButton(
               gradientColors: const [Colors.pink, Colors.blue],
               fontSize: 24,
