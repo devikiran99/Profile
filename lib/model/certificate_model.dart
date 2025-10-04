@@ -16,7 +16,7 @@ class CertificateModel {
 
 List<CertificateModel> certificateList = [
   CertificateModel(
-    name: 'Jetpack Compose Master class by Philip Lakner',
+    name: 'Jetpack Compose Master class by Philip Lackner',
     organization: 'PL Coding',
     date: 'June 2025',
     skills: 'Jetpack Compose | Kotlin',
