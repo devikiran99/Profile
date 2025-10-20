@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 import 'package:url_launcher/url_launcher.dart';
-import '../../view model/controller.dart';
 import '../../view model/responsive.dart';
 import '../about/about.dart';
 import '../certifications/certifications.dart';
@@ -23,30 +21,79 @@ class Holder extends StatefulWidget {
 
 class _HolderState extends State<Holder> {
 
+  final ScrollController _scrollController = ScrollController();
+
+  final List<GlobalKey> _sectionKeys = List.generate(6, (_) => GlobalKey());
+  int _selectedIndex = 0;
+
   final List<Widget> _pages = [
     const HomeScreen(),
     const About(),
     Skills(),
     Education(),
     Certifications(),
-    ProjectsView()
+    ProjectsView(),
   ];
-
-  int _selectedIndex = 0;
-  bool _innerScrollAtBottom = false;
-  bool _innerScrollAtTop = true;
 
   @override
   void initState() {
     super.initState();
-    controller.addListener(() {
-      int page = controller.page?.round() ?? 0;
-      if (page != _selectedIndex) {
-        setState(() {
-          _selectedIndex = page;
-        });
+    _scrollController.addListener(_updateSelectedSection);
+    WidgetsBinding.instance.addPostFrameCallback((_) => _updateSelectedSection());
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  void _scrollToSection(int index) {
+    final ctx = _sectionKeys[index].currentContext;
+    if (ctx != null) {
+      final box = ctx.findRenderObject() as RenderBox;
+
+      // Get AppBar height
+      final appBarHeight = kToolbarHeight;
+
+      // Offset of section relative to scrollable content
+      final offset = box.localToGlobal(Offset.zero, ancestor: null).dy +
+          _scrollController.offset -
+          appBarHeight;
+
+      _scrollController.animateTo(
+        offset,
+        duration: const Duration(milliseconds: 800),
+        curve: Curves.easeInOutCubic,
+      );
+
+      setState(() => _selectedIndex = index);
+    }
+  }
+
+
+  void _updateSelectedSection() {
+    if (!mounted) return;
+
+    final screenHeight = MediaQuery.of(context).size.height;
+    int newIndex = _selectedIndex;
+
+    for (int i = 0; i < _sectionKeys.length; i++) {
+      final ctx = _sectionKeys[i].currentContext;
+      if (ctx == null) continue;
+
+      final box = ctx.findRenderObject() as RenderBox;
+      final pos = box.localToGlobal(Offset.zero).dy;
+
+      if (pos <= screenHeight * 0.3 && pos + box.size.height > screenHeight * 0.3) {
+        newIndex = i;
+        break;
       }
-    });
+    }
+
+    if (newIndex != _selectedIndex) {
+      setState(() => _selectedIndex = newIndex);
+    }
   }
 
   @override
@@ -54,67 +101,53 @@ class _HolderState extends State<Holder> {
     return Scaffold(
       appBar: AppBar(
         titleSpacing: Responsive.isMobile(context) ? -10 : 0,
-        title: AppBarContent(selectedIndex: _selectedIndex, onNavTap: _navigate),
+        title: AppBarContent(
+          selectedIndex: _selectedIndex,
+          onNavTap: _scrollToSection,
+        ),
         centerTitle: true,
         backgroundColor: Colors.transparent,
-        iconTheme: const IconThemeData(
-          size: 32,
-          color: Colors.white,
-        ),
+        iconTheme: const IconThemeData(size: 32, color: Colors.white),
       ),
-      drawer: Responsive.isTablet(context) ? const NavDrawer() : null,
+      drawer: Responsive.isTablet(context) ? NavDrawer(
+        selectedIndex: _selectedIndex,
+        onNavTap: _scrollToSection
+      ) : null,
       body: Column(
         children: [
-          GradientDivider(gradientColor: [Colors.grey.shade200, Colors.grey.shade500, Colors.grey.shade600], height: 1),
-
+          GradientDivider(
+            gradientColor: [
+              Colors.grey.shade200,
+              Colors.grey.shade500,
+              Colors.grey.shade600,
+            ],
+            height: 1,
+          ),
           Expanded(
-            child: NotificationListener<ScrollNotification>(
-              onNotification: _handleScrollNotification,
-              child: PageView(
-                controller: controller,
-                scrollDirection: Axis.vertical,
-                physics: const ClampingScrollPhysics(),
-                children: _pages,
+            child: Scrollbar(
+              controller: _scrollController,
+              thickness: Responsive.isDesktop(context) ? 8 : 0,
+              radius: const Radius.circular(10),
+              child: SingleChildScrollView(
+                controller: _scrollController,
+                child: Column(
+                  children: [
+                    for (int i = 0; i < _pages.length; i++)
+                      ConstrainedBox(
+                        key: _sectionKeys[i],
+                        constraints: BoxConstraints(
+                          minHeight: MediaQuery.of(context).size.height,
+                        ),
+                        child: _pages[i],
+                      ),
+                  ],
+                ),
               ),
             ),
           ),
         ],
       ),
     );
-  }
-
-
-  void _navigate(int index) {
-    controller.animateToPage(index, duration: const Duration(milliseconds: 300), curve: Curves.easeInOutCubic);
-    setState(() {
-      _selectedIndex = index;
-    });
-  }
-
-  bool _handleScrollNotification(ScrollNotification notification) {
-    if (notification.metrics.axisDirection == AxisDirection.down) {
-      // Check if inner scroll is at bottom
-      _innerScrollAtBottom = notification.metrics.pixels >= notification.metrics.maxScrollExtent;
-      _innerScrollAtTop = notification.metrics.pixels <= notification.metrics.minScrollExtent;
-    }
-
-    if (notification is UserScrollNotification && notification.direction != ScrollDirection.idle) {
-      if (_innerScrollAtBottom && notification.direction == ScrollDirection.reverse) {
-        // User scrolls up beyond inner bottom: scroll page down
-        if (_selectedIndex < _pages.length - 1) {
-          controller.nextPage(duration: Duration(milliseconds: Responsive.isDesktop(context) ? 200 : 1500), curve: Curves.easeInOutCubic,);
-          return true;
-        }
-      }
-      if (_innerScrollAtTop && notification.direction == ScrollDirection.forward) {
-        // User scrolls down beyond inner top: scroll page up
-        if (_selectedIndex > 0) {
-          controller.previousPage(duration: Duration(milliseconds: Responsive.isDesktop(context) ? 200 : 1500), curve: Curves.easeInOutCubic);
-          return true;
-        }
-      }
-    }
-    return false;
   }
 }
 
@@ -142,21 +175,18 @@ class AppBarContent extends StatelessWidget {
             fontSize: 32,
             text: 'Devikiran',
             onTap: () {
-              launchUrl(Uri.parse('https://www.linkedin.com/in/devikiran-shetty-6899a9191/'));
+              launchUrl(Uri.parse(
+                  'https://www.linkedin.com/in/devikiran-shetty-6899a9191/'));
             },
           ),
           const Spacer(),
-          if (Responsive.isDesktop(context)) NavigationButtonList(selectedIndex: selectedIndex, onNavTap: onNavTap),
+          if (Responsive.isDesktop(context))
+            NavigationButtonList(
+              selectedIndex: selectedIndex,
+              onNavTap: onNavTap,
+            ),
         ],
       ),
     );
   }
 }
-
-
-
-
-
-
-
-

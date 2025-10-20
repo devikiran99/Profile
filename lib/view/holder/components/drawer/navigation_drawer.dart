@@ -1,14 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../../../res/constants.dart';
-import '../../../../view model/controller.dart';
 import '../../../home/components/social_media.dart';
 import '../footer_info.dart';
 import '../navigation_button_list.dart';
 import 'nav_drawer_profile.dart';
 
 class NavDrawer extends StatelessWidget {
-  const NavDrawer({super.key});
+
+  final int selectedIndex;
+  final ValueChanged<int> onNavTap;
+
+  const NavDrawer({super.key, required this.selectedIndex, required this.onNavTap});
 
   @override
   Widget build(BuildContext context) {
@@ -28,10 +31,10 @@ class NavDrawer extends StatelessWidget {
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 32),
                   child: NavigationButtonList(
-                    selectedIndex: controller.page?.round() ?? 0,
+                    selectedIndex:  selectedIndex,
                     onNavTap: (index) {
+                      onNavTap(index);
                       Navigator.of(context).pop();
-                      controller.animateToPage(index, duration: const Duration(milliseconds: 300), curve: Curves.easeInOutCubic);
                     },
                   ),
                 ),

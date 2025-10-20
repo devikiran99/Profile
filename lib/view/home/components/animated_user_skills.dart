@@ -5,6 +5,7 @@ class AnimatedUserSkills extends StatelessWidget {
   final List<String> skills = [
     'Mobile Dev',
     'Android',
+    'Kotlin',
     'Jetpack Compose',
     'Flutter',
   ];
