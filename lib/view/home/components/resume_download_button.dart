@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:url_launcher/url_launcher.dart';
-
+import 'dart:js_interop';
+import 'package:flutter/services.dart';
+import 'package:web/web.dart' as web;
 import '../../../res/constants.dart';
 
 class ResumeDownloadButton extends StatelessWidget {
@@ -10,7 +11,8 @@ class ResumeDownloadButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return InkWell(
       onTap: () {
-        launchUrl(Uri.parse('https://github.com/devikiran99/Resume/blob/main/Devikiran_Shetty_PN.pdf'));
+        _downloadAssetWeb();
+       // launchUrl(Uri.parse('https://github.com/devikiran99/Resume/blob/main/Devikiran_Shetty_PN.pdf'));
       },
       child: Container(
         alignment: Alignment.center,
@@ -53,4 +55,37 @@ class ResumeDownloadButton extends StatelessWidget {
       ),
     );
   }
+
+  Future<void> _downloadAssetWeb() async {
+    // Load asset
+    final String assetPath = "assets/files/Devikiran_Shetty_PN.pdf";
+    final String fileName = "Devikiran_Shetty_PN.pdf";
+    final byteData = await rootBundle.load(assetPath);
+    final Uint8List bytes = byteData.buffer.asUint8List();
+
+    // Create JS Blob
+    final blob = web.Blob(
+      [bytes.toJS].toJS,
+      web.BlobPropertyBag(type: 'application/octet-stream'),
+    );
+
+    // Create object URL
+    final url = web.URL.createObjectURL(blob);
+
+    // Create anchor element
+    final anchor = web.HTMLAnchorElement()
+      ..href = url
+      ..download = fileName
+      ..style.display = 'none';
+
+    // Trigger download
+    web.document.body!.append(anchor);
+    anchor.click();
+    anchor.remove();
+
+    // Cleanup
+    web.URL.revokeObjectURL(url);
+  }
+
 }
+

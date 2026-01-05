@@ -41,6 +41,7 @@ dependencies:
   url_launcher:
   font_awesome_flutter:
   animated_text_kit:
+  web:
 
 dev_dependencies:
   flutter_test:
@@ -70,7 +71,7 @@ flutter:
     - assets/images/institution/
     - assets/images/skills/
     - assets/utils/
-    - assets/resume/
+    - assets/files/
 
   # To add assets to your application, add an assets section, like this:
   # assets:

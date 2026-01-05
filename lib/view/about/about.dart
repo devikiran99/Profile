@@ -8,7 +8,7 @@ import 'components/gradient_textview.dart';
 
 class About extends StatelessWidget {
   final _aboutData =
-      "Hi, I am Devikiran Shetty PN from Mangalore. I hold a Master’s degree in Computer Applications from Nitte Mahalinga Adyantaya Memorial Institute of Technology (NMAMIT), Nitte, Karkala, Udupi. Presently, I am engaged as a Software Engineer at Global Delight Technology Private Limited in Udupi. With comprehensive exposure to the entire software development lifecycle, I have successfully contributed from initial requirement gathering to final product delivery. I thrive in dynamic, fast-paced environments working with small, focused teams, consistently delivering high-quality software solutions within tight deadlines. My approach emphasizes collaboration, leveraging agile and scrum methodologies to ensure efficient project execution without compromising on quality";
+      "Hi, I am Devikiran Shetty PN from Karnataka. I hold a Master’s degree in Computer Applications from Nitte Mahalinga Adyantaya Memorial Institute of Technology (NMAMIT), Nitte, Karkala, Udupi. Presently, I am engaged as a Software Engineer at Global Delight Technology Private Limited in Udupi. With comprehensive exposure to the entire software development lifecycle, I have successfully contributed from initial requirement gathering to final product delivery. I thrive in dynamic, fast-paced environments working with small, focused teams, consistently delivering high-quality software solutions within tight deadlines. My approach emphasizes collaboration, leveraging agile and scrum methodologies to ensure efficient project execution without compromising on quality";
 
   const About({super.key});
 
@@ -96,7 +96,7 @@ class About extends StatelessWidget {
           const SizedBox(height: 16),
           _keyValueTextView(key: 'Phone', value: '(+91) - 9483057401'),
           const SizedBox(height: 16),
-          _keyValueTextView(key: 'Place', value: 'Mangalore'),
+          _keyValueTextView(key: 'Place', value: 'Karnataka'),
         ],
       );
     } else {
@@ -119,7 +119,7 @@ class About extends StatelessWidget {
             children: [
               _keyValueTextView(key: 'Phone', value: '(+91) - 9483057401'),
               const SizedBox(width: 16),
-              _keyValueTextView(key: 'Place', value: 'Mangalore'),
+              _keyValueTextView(key: 'Place', value: 'Karnataka'),
             ],
           ),
         ],
